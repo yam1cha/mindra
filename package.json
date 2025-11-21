@@ -31,6 +31,7 @@
     "mac": {
       "target": "dmg",
       //"icon": "public/icon.icns",
+      "identity": null,
       "category": "public.app-category.utilities"
     },
     "nsis": {
