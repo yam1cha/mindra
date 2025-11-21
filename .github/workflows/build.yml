@@ -1,0 +1,42 @@
+name: Build Mindra
+
+# いつ動くか？ -> "v" から始まるタグが付いた時 (例: v0.1.0)
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # WindowsとMacの両方で同時に作業させる！
+        os: [windows-latest, macos-latest]
+
+    steps:
+      # 1. コードを持ってくる
+      - name: Check out git repository
+        uses: actions/checkout@v4
+
+      # 2. Node.js (v20) をセットアップ
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 3. 依存関係をインストール
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Reactをビルド
+      - name: Build React
+        run: npm run build
+
+      # 5. Electronをビルド＆リリース作成
+      # (Windowsならexe, Macならdmgが自動で作られるよ)
+      - name: Build Electron App
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run electron:build -- --publish always
